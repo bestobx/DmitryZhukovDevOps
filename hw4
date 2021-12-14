@@ -1,0 +1,79 @@
+1)Users and groups
+[zhukov@epam-workstation1 ~]$ sudo groupadd -g 4000 sales
+[zhukov@epam-workstation1 ~]$ sudo useradd bob && sudo useradd alice && sudo useradd eve 
+[zhukov@epam-workstation1 ~]$ sudo usermod bob -g sales -G bob 
+[zhukov@epam-workstation1 ~]$ sudo passwd bob
+[zhukov@epam-workstation1 ~]$ sudo usermod alice -g sales -G alice 
+[zhukov@epam-workstation1 ~]$ sudo usermod eve -g sales -G eve
+[zhukov@epam-workstation1 ~]$ sudo passwd alice
+[zhukov@epam-workstation1 ~]$ sudo passwd eve
+#Срок жизни пароля всех новых аккаунтов устанавливается директивой PASS_MAX_DAYS в /etc/login.defs
+
+[zhukov@epam-workstation1 ~]$ sudo chage -E 2022-03-14 alice && sudo chage -E 2022-03-14 eve && sudo chage -E 2022-03-14 -M 15 bob
+[zhukov@epam-workstation1 ~]$ sudo chage -l bob
+Last password change					: Dec 13, 2021
+Password expires					: Dec 28, 2021
+Password inactive					: never
+Account expires						: Mar 14, 2022
+Minimum number of days between password change		: 0
+Maximum number of days between password change		: 15
+Number of days of warning before password expires	: 7
+[zhukov@epam-workstation1 ~]$ id bob
+uid=1001(bob) gid=4000(sales) groups=4000(sales),1001(bob)
+
+#Заставим юзеров сменить пароли при первом логине (на примере alice) 
+[zhukov@epam-workstation1 ~]$ sudo passwd -e alice
+Expiring password for user alice.
+passwd: Success
+
+2)Controlling access to files with Linux file system permissions
+
+[root@epam-workstation1 ~]# useradd glen && useradd antony && useradd lesly
+[root@epam-workstation1 ~]# groupadd -g 3000 students
+[root@epam-workstation1 ~]# usermod glen -G students && usermod antony -G students && usermod lesly -G students
+[root@epam-workstation1 ~]# mkdir /home/students
+[root@epam-workstation1 ~]# chown root:students /home/students/
+[root@epam-workstation1 ~]# chmod 4770 /home/students/
+
+
+3)ACL
+[root@epam-workstation1 ~]# mkdir -p /share/cases
+[root@epam-workstation1 ~]# touch /share/cases/murders.txt
+[root@epam-workstation1 ~]# touch /share/cases/moriarty.txt
+[root@epam-workstation1 ~]# useradd holmes
+[root@epam-workstation1 ~]# useradd watson
+[root@epam-workstation1 ~]# groupadd bakerstreet
+[root@epam-workstation1 ~]# usermod holmes -G bakerstreet
+[root@epam-workstation1 ~]# passwd holmes
+[root@epam-workstation1 ~]# 
+[root@epam-workstation1 ~]# id holmes
+uid=1007(holmes) gid=1007(holmes) groups=1007(holmes),4001(bakerstreet)
+[root@epam-workstation1 ~]# 
+[root@epam-workstation1 ~]# 
+[root@epam-workstation1 ~]# chown :bakerstreet /share/cases/
+[root@epam-workstation1 ~]# adduser gregson
+[root@epam-workstation1 ~]# passwd gregson 
+[root@epam-workstation1 ~]# groupadd scotlandyard
+[root@epam-workstation1 ~]# useradd jones
+[root@epam-workstation1 ~]# passwd jones
+[root@epam-workstation1 ~]# usermod gregson -G scotlandyard
+[root@epam-workstation1 ~]# usermod jones -G scotlandyard
+[root@epam-workstation1 ~]# id jones
+uid=1010(jones) gid=1010(jones) groups=1010(jones),4002(scotlandyard)
+[root@epam-workstation1 ~]# 
+[root@epam-workstation1 ~]# setfacl -m g:scotlandyard:rw /share/cases/
+[root@epam-workstation1 ~]# setfacl -m g:bakerstreet:rwx /share/cases/
+[root@epam-workstation1 ~]# setfacl -m u:jones:r /share/cases/
+[root@epam-workstation1 ~]# getfacl /share/cases/
+getfacl: Removing leading '/' from absolute path names
+# file: share/cases/
+# owner: root
+# group: bakerstreet
+# flags: s--
+user::rwx
+user:jones:r--
+group::r-x
+group:bakerstreet:rwx
+group:scotlandyard:rw-
+mask::rwx
+other::---
