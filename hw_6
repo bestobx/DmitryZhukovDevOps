@@ -1,0 +1,99 @@
+#Task 1
+
+[zhukov@epam-workstation1 root]$ ssh  Dmitrii_Zhukov@18.221.144.175 
+The authenticity of host '18.221.144.175 (18.221.144.175)' can't be established.
+ECDSA key fingerprint is 01:a1:c8:32:41:5c:9b:4b:0a:cc:f0:4b:7e:66:2b:38.
+Are you sure you want to continue connecting (yes/no)? yes
+Warning: Permanently added '18.221.144.175' (ECDSA) to the list of known hosts.
+Dmitrii_Zhukov@18.221.144.175's password: 
+Last login: Mon Dec 20 21:30:12 2021 from pppoe.178-66-156-37.dynamic.avangarddsl.ru
+
+       __|  __|_  )
+       _|  (     /   Amazon Linux 2 AMI
+      ___|\___|___|
+
+https://aws.amazon.com/amazon-linux-2/
+No packages needed for security; 4 packages available
+Run "sudo yum update" to apply all updates.
+Dmitrii_Zhukov@ip-172-31-33-155 ~]$ logout
+Connection to 18.221.144.175 closed.
+
+[root@epam-workstation1 ~]# ssh-keygen 
+Generating public/private rsa key pair.
+Enter file in which to save the key (/root/.ssh/id_rsa): hw-5
+Enter passphrase (empty for no passphrase): 
+Enter same passphrase again: 
+Your identification has been saved in hw-5.
+Your public key has been saved in hw-5.pub.
+
+[root@epam-workstation1 ~]# ssh Dmitrii_Zhukov@18.221.144.175 -i hw-5
+Enter passphrase for key 'hw-5': 
+Last login: Tue Dec 21 19:47:19 2021 from pppoe.178-66-156-37.dynamic.avangarddsl.ru
+
+https://aws.amazon.com/amazon-linux-2/
+No packages needed for security; 4 packages available
+Run "sudo yum update" to apply all updates.
+
+
+[root@epam-workstation1 ~]# ssh homework6
+Enter passphrase for key '/root/hw-5': 
+Last login: Wed Dec 22 18:06:17 2021 from pppoe.178-66-156-37.dynamic.avangarddsl.ru
+
+[root@epam-workstation1 ~]# cat .ssh/config 
+Host homework6
+	Hostname 18.221.144.175
+	Port 22
+	User Dmitrii_Zhukov
+	IdentityFile /root/hw-5 
+
+[Dmitrii_Zhukov@ip-172-31-33-155 ~]$ curl -LI 172.31.45.237
+HTTP/1.1 200 OK
+Server: nginx/1.20.1
+Date: Mon, 20 Dec 2021 21:39:34 GMT
+Content-Type: text/html
+Content-Length: 1856
+Last-Modified: Thu, 16 Dec 2021 09:00:42 GMT
+Connection: keep-alive
+ETag: “61bb003a-740”
+Accept-Ranges: bytes
+
+[root@epam-workstation1 ~]# ssh -f -N -L 6666:127.0.0.1:80 Dmitrii_Zhukov@18.221.144.175 
+
+#Task2
+
+[root@epam-workstation1 ~]# timedatectl list-timezones | grep Havana
+America/Havana
+[root@epam-workstation1 ~]# timedatectl set-timezone America/Havana
+[root@epam-workstation1 ~]# timedatectl
+      Local time: Чт 2021-12-23 13:29:53 CST
+  Universal time: Чт 2021-12-23 18:29:53 UTC
+        RTC time: Чт 2021-12-23 18:29:53
+       Time zone: America/Havana (CST, -0500)
+     NTP enabled: n/a
+NTP synchronized: no
+ RTC in local TZ: no
+      DST active: no
+ Last DST change: DST ended at
+                  Вс 2021-11-07 00:59:59 CDT
+                  Вс 2021-11-07 00:00:00 CST
+ Next DST change: DST begins (the clock jumps one hour forward) at
+                  Сб 2022-03-12 23:59:59 CST
+                  Вс 2022-03-13 01:00:00 CDT
+
+[root@epam-workstation1 ~]# journalctl --since "50 min ago"
+-- Logs begin at Чт 2021-12-23 12:56:29 CST, end at Чт 2021-12-23 13:29:25 CST. 
+дек 23 13:01:01 epam-workstation1 kernel: SELinux: initialized (dev tmpfs, type 
+дек 23 13:01:01 epam-workstation1 systemd[1]: Created slice user-0.slice.
+дек 23 13:01:01 epam-workstation1 systemd[1]: Starting user-0.slice.
+дек 23 13:01:01 epam-workstation1 systemd[1]: Started Session 1 of user root.
+дек 23 13:01:01 epam-workstation1 systemd[1]: Starting Session 1 of user root.
+дек 23 13:01:01 epam-workstation1 CROND[1981]: (root) CMD (run-parts /etc/cron.h
+дек 23 13:01:01 epam-workstation1 run-parts(/etc/cron.hourly)[1984]: starting 0a
+дек 23 13:01:01 epam-workstation1 anacron[1990]: Anacron started on 2021-12-23
+дек 23 13:01:01 epam-workstation1 run-parts(/etc/cron.hourly)[1992]: finished 
+
+[root@epam-workstation1 ~]# journalctl _UID=81 --since "50 min ago"
+-- Logs begin at Чт 2021-12-23 12:56:29 CST, end at Чт 2021-12-23 13:29:25 CST. --
+дек 23 13:17:48 epam-workstation1 dbus[618]: [system] Reloaded configuration
+дек 23 13:17:49 epam-workstation1 dbus[618]: [system] Reloaded configuration
+дек 23 13:17:49 epam-workstation1 dbus[618]: [system] Reloaded configuration
