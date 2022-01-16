@@ -1,0 +1,107 @@
+#Boot process
+
+[root@epam-workstation1 ~]# cat /etc/default/grub 
+GRUB_TIMEOUT=5
+GRUB_DISTRIBUTOR="$(sed 's, release .*$,,g' /etc/system-release)"
+GRUB_DEFAULT=saved
+GRUB_DISABLE_SUBMENU=true
+GRUB_TERMINAL_OUTPUT="console"
+GRUB_CMDLINE_LINUX="crashkernel=auto rd.lvm.lv=centos/root rd.lvm.lv=centos/swap rhgb quiet"
+GRUB_DISABLE_RECOVERY="false"
+
+[root@epam-workstation1 ~]# grub2-mkconfig -o /boot/grub2/grub.cfg
+Generating grub configuration file ...
+Found linux image: /boot/vmlinuz-3.10.0-1160.49.1.el7.x86_64
+Found initrd image: /boot/initramfs-3.10.0-1160.49.1.el7.x86_64.img
+Found linux image: /boot/vmlinuz-3.10.0-327.el7.x86_64
+Found initrd image: /boot/initramfs-3.10.0-327.el7.x86_64.img
+Found linux image: /boot/vmlinuz-0-rescue-893b2abc75e23e4fb42a8634ad66478b
+Found initrd image: /boot/initramfs-0-rescue-893b2abc75e23e4fb42a8634ad66478b.img
+
+[root@epam-workstation1 ~]# cat /boot/grub2/grub.cfg | grep recovery
+menuentry 'CentOS Linux (3.10.0-1160.49.1.el7.x86_64) 7 (Core) (recovery mode)' --class centos --class gnu-linux --class gnu --class os --unrestricted $menuentry_id_option 'gnulinux-3.10.0-1160.49.1.el7.x86_64-recovery-faf9bf5d-b279-4aab-a9af-c8df2a7951c1' {
+menuentry 'CentOS Linux (3.10.0-327.el7.x86_64) 7 (Core) (recovery mode)' --class centos --class gnu-linux --class gnu --class os --unrestricted $menuentry_id_option 'gnulinux-3.10.0-327.el7.x86_64-recovery-faf9bf5d-b279-4aab-a9af-c8df2a7951c1' {
+menuentry 'CentOS Linux (0-rescue-893b2abc75e23e4fb42a8634ad66478b) 7 (Core) (recovery mode)' --class centos --class gnu-linux --class gnu --class os --unrestricted $menuentry_id_option 'gnulinux-0-rescue-893b2abc75e23e4fb42a8634ad66478b-recovery-faf9bf5d-b279-4aab-a9af-c8df2a7951c1' {
+
+[root@epam-workstation1 ~]# sysctl -a | grep vm.dirty_ratio
+sysctl: reading key "net.ipv6.conf.all.stable_secret"
+sysctl: reading key "net.ipv6.conf.default.stable_secret"
+sysctl: reading key "net.ipv6.conf.enp0s3.stable_secret"
+sysctl: reading key "net.ipv6.conf.lo.stable_secret"
+vm.dirty_ratio = 30
+
+[root@epam-workstation1 ~]# echo '31' > /proc/sys/vm/dirty_ratio 
+[root@epam-workstation1 ~]# cat /proc/sys/vm/dirty_ratio 
+31
+
+[root@epam-workstation1 ~]# sysctl -w vm.dirty_ratio=32
+vm.dirty_ratio = 32
+[root@epam-workstation1 ~]# cat /proc/sys/vm/dirty_ratio 
+32
+
+[root@epam-workstation1 ~]# nano /etc/sysctl.conf 
+[root@epam-workstation1 ~]# sysctl -p
+.vm.dirty_ratio = 25
+[root@epam-workstation1 ~]# cat /etc/sysctl.conf | grep dirty
+/vm/dirty_ratio = 25
+
+#SElinux
+
+[root@epam-workstation1 ~]# getenforce
+Enforcing
+[root@epam-workstation1 ~]# grubby --args="selinux=0" --update-kernel /boot/vmlinuz-$(uname -r)
+[root@epam-workstation1 ~]# init 6
+Connection to 192.168.138.70 closed by remote host.
+Connection to 192.168.138.70 closed.
+(base) DVZ-2:~ dmitrij$ ssh root@192.168.138.70
+root@192.168.138.70's password: 
+Last login: Tue Jan 11 00:47:15 2022 from 192.168.138.64
+[root@epam-workstation1 ~]# getenforce
+Disabled
+[root@epam-workstation1 ~]# cat /proc/cmdline 
+BOOT_IMAGE=/vmlinuz-3.10.0-1160.49.1.el7.x86_64 root=/dev/mapper/centos-root ro crashkernel=auto rd.lvm.lv=centos/root rd.lvm.lv=centos/swap rhgb quiet selinux=0
+
+
+#Firewalls
+
+[root@epam-workstation1 ~]# firewall-cmd --list-all
+public (active)
+  target: default
+  icmp-block-inversion: no
+  interfaces: enp0s3
+  sources: 
+  services: dhcpv6-client
+  ports: 
+  protocols: 
+  masquerade: no
+  forward-ports: 
+  source-ports: 
+  icmp-blocks: 
+  rich rules: 
+[root@epam-workstation1 ~]# firewall-cmd --zone=internal --add-port=22/tcp --permanent
+success
+[root@epam-workstation1 ~]# firewall-cmd --zone=internal --add-source=192.168.56.0/24 --permanent
+success
+[root@epam-workstation1 ~]# firewall-cmd --zone=public --remove-service=ssh --permanent
+[root@epam-workstation1 ~]# firewall-cmd --reload
+success
+
+[root@epam-workstation1 ~]# systemctl disable firewalld.service
+Removed symlink /etc/systemd/system/multi-user.target.wants/firewalld.service.
+Removed symlink /etc/systemd/system/dbus-org.fedoraproject.FirewallD1.service.
+
+[root@epam-workstation1 ~]# systemctl enable --now iptables
+Created symlink from /etc/systemd/system/basic.target.wants/iptables.service to /usr/lib/systemd/system/iptables.service.
+[root@epam-workstation1 ~]# systemctl status iptables.service
+● iptables.service - IPv4 firewall with iptables
+   Loaded: loaded (/usr/lib/systemd/system/iptables.service; enabled; vendor preset: disabled)
+   Active: active (exited) since Чт 2022-01-13 00:17:20 MSK; 7min ago
+  Process: 1031 ExecStart=/usr/libexec/iptables/iptables.init start (code=exited, status=0/SUCCESS)
+ Main PID: 1031 (code=exited, status=0/SUCCESS)
+
+[root@epam-workstation1 ~]# iptables -I INPUT 1 -p tcp --dport 22 -s 192.168.56.0/24 -j ACCEPT
+[root@epam-workstation1 ~]# iptables -I INPUT 2 -p tcp --dport 22 -j DROP
+[root@epam-workstation1 ~]# service iptables save
+iptables: Saving firewall rules to /etc/sysconfig/iptables:[  OK  ]
+[root@epam-workstation1 ~]# systemctl reload iptables
+
