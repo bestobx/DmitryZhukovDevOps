@@ -1,0 +1,78 @@
+1)Task 1
+#RPM
+
+[root@epam-workstation1 ~]# yum install --downloadonly --downloaddir=/tmp/ sysstat
+[root@epam-workstation1 tmp]# rpm -qip sysstat-10.1.5-19.el7.x86_64.rpm 
+Name        : sysstat
+Version     : 10.1.5
+Release     : 19.el7
+Architecture: x86_64
+Install Date: (not installed)
+Group       : Applications/System
+Size        : 1172488
+License     : GPLv2+
+Signature   : RSA/SHA256, Sat 04 Apr 2020 12:08:48 AM MSK, Key ID 24c6a8a7f4a80eb5
+Source RPM  : sysstat-10.1.5-19.el7.src.rpm
+Build Date  : Wed 01 Apr 2020 07:36:37 AM MSK
+Build Host  : x86-01.bsys.centos.org
+Relocations : (not relocatable)
+Packager    : CentOS BuildSystem <http://bugs.centos.org>
+Vendor      : CentOS
+URL         : http://sebastien.godard.pagesperso-orange.fr/
+Summary     : Collection of performance monitoring tools for Linux
+[root@epam-workstation1 tmp]# rpm -ivh sysstat-10.1.5-19.el7.x86_64.rpm --nodeps
+Preparing...                          ################################# [100%]
+Updating / installing...
+   1:sysstat-10.1.5-19.el7            ################################# [100%]
+[root@epam-workstation1 tmp]# rpm -ql sysstat
+/etc/cron.d/sysstat
+/etc/sysconfig/sysstat
+/etc/sysconfig/sysstat.ioconf
+/usr/bin/cifsiostat
+/usr/bin/iostat
+/usr/bin/mpstat
+/usr/bin/nfsiostat-sysstat
+/usr/bin/pidstat
+/usr/bin/sadf
+/usr/bin/sar
+/usr/bin/tapestat
+/usr/lib/systemd/system/sysstat.service
+
+#YUM
+
+[root@epam-workstation1 ~]# cat /etc/yum.repos.d/nginx.repo 
+[nginx]
+name=nginx repo
+baseurl=https://nginx.org/packages/centos/$releasever/$basearch/
+gpgcheck=0
+enabled=1
+[root@epam-workstation1 yum.repos.d]# yum repolist | grep nginx
+nginx/7/x86_64                      nginx repo                               256
+
+[root@epam-workstation1 ~]# yum install nginx
+[root@epam-workstation1 ~]# yum history info nginx
+[root@epam-workstation1 ~]# yum --disablerepo=nginx/7/x86_64
+[root@epam-workstation1 ~]# yum remove sysstat
+Removed:
+  sysstat.x86_64 0:10.1.5-19.el7 
+[root@epam-workstation1 ~]# yum -y install epel-release
+[root@epam-workstation1 ~]# yum repolist | grep epel
+ * epel: mirror.nsc.liu.se
+epel/x86_64           Extra Packages for Enterprise Linux 7 - x86_64      13,703
+[root@epam-workstation1 ~]# yum install ncdu
+Installed:
+  ncdu.x86_64 0:1.16-1.el7 
+
+
+2)Task 2
+[zhukov@epam-workstation1 ~]$ find . -type f -size -10b | wc -l
+114
+[zhukov@epam-workstation1 /]$ ls -id /
+128 /
+
+[zhukov@epam-workstation1 /]$ du -sh / 2> /dev/null
+2.2G	/
+[zhukov@epam-workstation1 /]$ df -h /
+Filesystem               Size  Used Avail Use% Mounted on
+/dev/mapper/centos-root  6.7G  2.2G  4.6G  32% /
+[root@epam-workstation1 ~]# ncdu /var/log/
