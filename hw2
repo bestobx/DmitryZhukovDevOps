@@ -1,0 +1,26 @@
+Homework2
+
+2. Скрипт script1.sh
+#!bin/bash
+touch ../task2.txt 2> ~/err.log || echo "Error"
+
+[zhukov@epam-workstation1 2]$ pwd
+/home/zhukov/lesson2/1/2
+[zhukov@epam-workstation1 2]$ ls ..
+2
+[zhukov@epam-workstation1 2]$ bash script1.sh && ls ..
+2  task2.txt
+[zhukov@epam-workstation1 2]$  cd / && bash ~/lesson2/1/2/script1.sh
+Error
+[zhukov@epam-workstation1 /]$ cat ~/err.log
+touch: невозможно выполнить touch для «../task2.txt»: Отказано в доступе
+
+
+3. Скрипт script2.sh
+#!bin/bash
+a=`cat current_directory`; ls $a
+
+[zhukov@epam-workstation1 2]$ ls
+script1.sh  script2.sh
+[zhukov@epam-workstation1 2]$ pwd > current_directory && bash script2.sh 
+current_directory  script1.sh  script2.sh
