@@ -1,0 +1,11 @@
+1)
+[zhukov@epam-workstation1 ~]$ awk '{print $12}' access.log | sort | uniq -dc | sort -nr | head -1
+ 363961 "Mozilla/4.0
+ 
+2)
+[zhukov@epam-workstation1 ~]$ awk '{print $1,$4}' access.log | grep /Dec/2021 | grep 216.244.66.230 | wc -l
+5
+
+3)
+[zhukov@epam-workstation1 ~]$ grep 216.244.66.230 access.log | awk '{sum+=$10;}END{print sum;}'
+13846204
