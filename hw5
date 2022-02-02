@@ -1,0 +1,45 @@
+1)
+
+[root@epam-workstation1 ~]# sleep 5000 &
+[1] 2031
+[root@epam-workstation1 ~]# sleep 6000 &
+[2] 2032
+[root@epam-workstation1 ~]# sleep 7000 &
+[3] 2033
+[root@epam-workstation1 ~]# killall -23 sleep
+[root@epam-workstation1 ~]# ps aux | grep sleep
+root      2031  0.0  0.0 107892   620 pts/0    S    23:08   0:00 sleep 5000
+root      2032  0.0  0.0 107892   620 pts/0    S    23:08   0:00 sleep 6000
+root      2033  0.0  0.0 107892   624 pts/0    S    23:08   0:00 sleep 7000
+
+2)
+[root@epam-workstation1 system]# cat /home/zhukov/lesson5/lesson5.sh 
+#!bin/bash
+sleep 10 ; echo 1 > /tmp/homework
+[root@epam-workstation1 system]# cat /home/zhukov/lesson5/lesson5_2.sh 
+#!bin/bash
+
+echo 2 > /tmp/homework
+
+[root@epam-workstation1 system]# cat lesson5.service 
+[Unit]
+Description=Daemon_for_lesson5
+
+[Service]
+ExecStart=/home/zhukov/lesson5/lesson5.sh
+[Install]
+WantedBy=multi-user.target
+[root@epam-workstation1 system]# cat lesson5_2.service 
+[Unit]
+Description=Lesson5_daemon2
+After=lesson5.service
+Requires=lesson5.service
+
+[Service]
+ExecStart=/home/zhukov/lesson5/lesson5_2.sh
+
+[Install]
+WantedBy=multi-user.target
+
+[root@epam-workstation1 ~]# systemctl enable lesson5.service
+[root@epam-workstation1 ~]# systemctl enable lesson5_2.service
